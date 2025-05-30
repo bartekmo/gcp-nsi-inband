@@ -40,6 +40,7 @@ module "producer_net" {
 }
 
 resource "google_compute_instance_template" "nva" {
+  name         = "${local.prefix}nva-tmpl${local.suffix}"
   machine_type = "e2-standard-2"
 
   network_interface {
@@ -59,6 +60,7 @@ tc filter add dev ens4 parent ffff: protocol ip prio 1 u32 \
   match ip dport 6081 0xffff \
   action nat ingress ${google_compute_address.nsi_ilb.address}/32 ${cidrhost(var.cidr_producer, 1)} \
   action nat egress ${cidrhost(var.cidr_producer, 1)}/32 ${google_compute_address.nsi_ilb.address}
+sysctl -w net.ipv4.ip_forward=1
   EOF
 }
 
